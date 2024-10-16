@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include <string.h>
-
+#include "fp_open.c"
 
 
 
@@ -9,14 +9,13 @@ typedef enum {
   META_COMMAND_UNRECOGNIZED_COMMAND
 } MetaCommandResult;
 
-typedef enum { PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT } PrepareResult;
+typedef enum { PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT, STATEMENT_SHOW } PrepareResult;
 
 typedef enum { STATEMENT_INSERT, STATEMENT_SELECT } StatementType;
 
 typedef struct {
   StatementType type;
 } Statement;
-
 
 
 typedef struct {
@@ -80,7 +79,11 @@ PrepareResult prepare_statement(InputBuffer* input_buffer,
   if (strcmp(input_buffer->buffer, "select") == 0) {
     statement->type = STATEMENT_SELECT;
     return PREPARE_SUCCESS;
+  }if(strcmp(input_buffer->buffer, "show")== 0){
+    statement->type = STATEMENT_SHOW;
+    return PREPARE_SUCCESS;
   }
+
 
   return PREPARE_UNRECOGNIZED_STATEMENT;
 }
@@ -88,11 +91,14 @@ PrepareResult prepare_statement(InputBuffer* input_buffer,
 void execute_statement(Statement* statement) {
   switch (statement->type) {
     case (STATEMENT_INSERT):
-    //TODO Implement the command here
-      break;
+    input_data();
+    break;
     case (STATEMENT_SELECT):
-      //TODO implement the command here 
-      break;
+    //TODO
+    break;
+    case (STATEMENT_SHOW):
+    read_data();
+    break;
   }
 }
 
