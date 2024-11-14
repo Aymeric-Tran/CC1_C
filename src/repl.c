@@ -1,8 +1,22 @@
 #include <stdbool.h>
 #include <string.h>
 #include "fp_open.c"
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 
+void INThandler(int sig)
+{
+    if (sig == SIGINT) {
+        char c;
+        printf("OUCH, did you hit Ctrl-C?\nDo you really want to quit? [y/n] ");
+        c = getchar();
+        if (c == 'y' || c == 'Y') {
+            exit(0);
+        }
+    }
+}
 
 typedef enum {
   META_COMMAND_SUCCESS,
@@ -64,7 +78,8 @@ MetaCommandResult do_meta_command(InputBuffer* input_buffer) {
     close_input_buffer(input_buffer);
     exit(EXIT_SUCCESS);
   } else {
-    //TODO  here implement handling of other input as .exit
+    INThandler();
+    if(strcmp(input_buffer->buffer, ))
     return META_COMMAND_UNRECOGNIZED_COMMAND;
   }
 }
@@ -104,6 +119,8 @@ void execute_statement(Statement* statement) {
 
 
 void repl(void){
+  signal(SIGINT, INThandler);
+
   InputBuffer* input_buffer = new_input_buffer();
   while (true) {
     print_prompt();
