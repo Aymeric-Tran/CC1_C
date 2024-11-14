@@ -5,11 +5,9 @@
 # -O2: Optimize the code for speed while maintaining reasonable compile times
 # -D_FORTIFY_SOURCE=2: Enhance buffer overflow detection
 # -fstack-protector-strong: Protect against stack buffer overflows
-# -fPIE: Produce position-independent executables
-# -pie: Link the object files into a position-independent executable
 
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -g -O2 -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fPIE -pie
+CFLAGS = -Wall -Wextra -pedantic -g -O2 -D_FORTIFY_SOURCE=2 -fstack-protector-strong 
 SRC = main.c btree.c fp_open.c repl.c
 TARGET = CC_1_DB
 OBJS = $(SRC:.c=.o)
