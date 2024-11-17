@@ -1,7 +1,9 @@
 #include "btree.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // Creates a new B-Tree and initializes the root node.
-btree* create_bTree() {
+bTree* create_bTree() {
     bTree *tree = (bTree*)malloc(sizeof(bTree));
     if (tree == NULL) {
         printf("Memory allocation failed\n");
@@ -36,7 +38,7 @@ void splitChild(bTreeNode *x, int i, bTreeNode *y) {
 
     if (!y->leaf)
         for (int j = 0; j < MAX / 2; j++)
-            z->children[j + MAX / 2] = y->children[j + MAX / 2];
+            z->children[j] = y->children[j + MAX / 2];
 
     y->actual_keys_in_node = (MAX / 2) - 1;
 
@@ -102,6 +104,14 @@ void traverse(bTreeNode *node) {
 
     if (!node->leaf)
         traverse(node->children[i]);
+}
+
+// Finds the index of the first key that is greater than or equal to k.
+int findKey(bTreeNode* node, int k) {
+    int idx = 0;
+    while (idx < node->actual_keys_in_node && node->keys[idx] < k)
+        ++idx;
+    return idx;
 }
 
 // Removes a key from a leaf node.
@@ -260,106 +270,3 @@ void deleteKey(bTreeNode* node, int k) {
             deleteKey(node->children[idx], k);
     }
 }
-
-// Test cases for each function
-/*
-void test_create_bTree() {
-    bTree *tree = create_bTree();
-    assert(tree != NULL);
-    assert(tree->root != NULL);
-    assert(tree->root->leaf == true);
-    assert(tree->root->actual_keys_in_node == 0);
-    free(tree->root);
-    free(tree);
-}
-
-void test_new_Node() {
-    bTreeNode *node = new_Node(true);
-    assert(node != NULL);
-    assert(node->leaf == true);
-    assert(node->actual_keys_in_node == 0);
-    for (int i = 0; i < MAX; i++) {
-        assert(node->children[i] == NULL);
-    }
-    free(node);
-}
-
-void test_insert() {
-    bTree *tree = create_bTree();
-    insert(tree, 10);
-    insert(tree, 20);
-    insert(tree, 5);
-    insert(tree, 6);
-    insert(tree, 12);
-    insert(tree, 30);
-    insert(tree, 7);
-    insert(tree, 17);
-
-    printf("Traversal of the constructed B-Tree is:");
-    traverse(tree->root);
-    printf("\n");
-    free(tree);
-}
-
-void test_deleteKey() {
-    bTree *tree = create_bTree();
-    insert(tree, 10);
-    insert(tree, 20);
-    insert(tree, 5);
-    insert(tree, 6);
-    insert(tree, 12);
-    insert(tree, 30);
-    insert(tree, 7);
-    insert(tree, 17);
-
-    // Before deletion: Tree should have all inserted keys
-    printf("Traversal before deletion:\n");
-    traverse(tree->root);
-
-    // Delete 6
-    deleteKey(tree->root, 6);
-    printf("\nTraversal after deleting 6:\n");
-    traverse(tree->root);
-
-    // Delete 13
-    deleteKey(tree->root, 13); // Key not present
-    printf("\nTraversal after trying to delete 13 (not present):\n");
-    traverse(tree->root);
-
-    // Additional deletions and verifications
-    deleteKey(tree->root, 7);
-    deleteKey(tree->root, 4); // Key not present
-
-    printf("\nFinal traversal after multiple deletions:\n");
-    traverse(tree->root);
-}
-
-void test_splitChild() {
-    bTreeNode *root = new_Node(false);
-    root->keys[0] = 10;
-    root->keys[1] = 20;
-    root->actual_keys_in_node = 2;
-
-    bTreeNode *child1 = new_Node(true);
-    child1->keys[0] = 5;
-    child1->keys[1] = 6;
-    child1->keys[2] = 12;
-    child1->actual_keys_in_node = 3;
-
-    root->children[0] = child1;
-
-    splitChild(root, 0, child1);
-
-    printf("Root keys after splitting child1:\n");
-    for (int i = 0; i < root->actual_keys_in_node; i++)
-        printf("%d ", root->keys[i]);
-
-    printf("\nChild nodes after splitting:\n");
-    for (int i = 0; i < root->children[0]->actual_keys_in_node; i++)
-        printf("%d ", root->children[0]->keys[i]);
-    printf("\n");
-    for (int i = 0; i < root->children[1]->actual_keys_in_node; i++)
-        printf("%d ", root->children[1]->keys[i]);
-}
-
-*/

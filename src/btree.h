@@ -18,6 +18,17 @@ bTree* create_bTree();
 bTreeNode* new_Node(bool leaf);
 void splitChild(bTreeNode *x, int i, bTreeNode *y);
 void insert(bTree *tree, int k);
+void insertNonFull(bTreeNode *x, int k);
+void traverse(bTreeNode *node);
+void deleteKey(bTreeNode* node, int k);
+int findKey(bTreeNode* node, int k);
+void removeFromLeaf(bTreeNode* node, int idx);
+void removeFromNonLeaf(bTreeNode* node, int idx);
+int getPredecessor(bTreeNode* node, int idx);
+int getSuccessor(bTreeNode* node, int idx);
+void fill(bTreeNode* node, int idx);
+void borrowFromPrev(bTreeNode* node, int idx);
+void borrowFromNext(bTreeNode* node, int idx);
+void merge(bTreeNode* node, int idx);
 
 #endif // BTREE_H
-

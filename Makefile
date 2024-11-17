@@ -7,7 +7,7 @@
 # -fstack-protector-strong: Protect against stack buffer overflows
 
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -g -O2 -D_FORTIFY_SOURCE=2 -fstack-protector-strong 
+CFLAGS = -Wall -Wextra -pedantic -g -O2 -D_FORTIFY_SOURCE=2 -fstack-protector-strong -I.
 SRC = main.c btree.c fp_open.c repl.c
 TARGET = CC_1_DB
 OBJS = $(SRC:.c=.o)

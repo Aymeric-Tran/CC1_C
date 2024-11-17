@@ -1,13 +1,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include "fp_open.c"
+#include "btree.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-
-void INThandler(int sig)
-{
+void INThandler(int sig) {
     if (sig == SIGINT) {
         char c;
         printf("OUCH, did you hit Ctrl-C?\nDo you really want to quit? [y/n] ");
@@ -25,12 +24,12 @@ typedef enum {
 
 typedef enum { PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT, STATEMENT_SHOW } PrepareResult;
 
-typedef enum { STATEMENT_INSERT, STATEMENT_SELECT } StatementType;
+typedef enum { STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_DELETE } StatementType;
 
 typedef struct {
   StatementType type;
+  int key;
 } Statement;
-
 
 typedef struct {
   char* buffer;
@@ -49,9 +48,6 @@ InputBuffer* new_input_buffer() {
 
 void print_prompt() { printf("db > "); }
 
-
-
-
 void read_input(InputBuffer* input_buffer) {
   ssize_t bytes_read =
       getline(&(input_buffer->buffer), &(input_buffer->buffer_length), stdin);
@@ -66,62 +62,69 @@ void read_input(InputBuffer* input_buffer) {
   input_buffer->buffer[bytes_read - 1] = 0;
 }
 
-
 void close_input_buffer(InputBuffer* input_buffer) {
     free(input_buffer->buffer);
     free(input_buffer);
 }
-
 
 MetaCommandResult do_meta_command(InputBuffer* input_buffer) {
   if (strcmp(input_buffer->buffer, ".exit") == 0) {
     close_input_buffer(input_buffer);
     exit(EXIT_SUCCESS);
   } else {
-    INThandler();
-    if(strcmp(input_buffer->buffer, ))
     return META_COMMAND_UNRECOGNIZED_COMMAND;
   }
 }
 
-PrepareResult prepare_statement(InputBuffer* input_buffer,
-                                Statement* statement) {
-
+PrepareResult prepare_statement(InputBuffer* input_buffer, Statement* statement) {
   if (strncmp(input_buffer->buffer, "insert", 6) == 0) {
     statement->type = STATEMENT_INSERT;
     return PREPARE_SUCCESS;
   }
-  if (strcmp(input_buffer->buffer, "select") == 0) {
+  if (strncmp(input_buffer->buffer, "select", 6) == 0) {
     statement->type = STATEMENT_SELECT;
     return PREPARE_SUCCESS;
-  }if(strcmp(input_buffer->buffer, "show")== 0){
+  }
+  if (strncmp(input_buffer->buffer, "delete", 6) == 0) {
+    statement->type = STATEMENT_DELETE;
+    return PREPARE_SUCCESS;
+  }
+  if (strcmp(input_buffer->buffer, "show") == 0) {
     statement->type = STATEMENT_SHOW;
     return PREPARE_SUCCESS;
   }
 
-
   return PREPARE_UNRECOGNIZED_STATEMENT;
 }
 
-void execute_statement(Statement* statement) {
+void execute_statement(Statement* statement, bTree* tree) {
   switch (statement->type) {
     case (STATEMENT_INSERT):
-    input_data();
-    break;
+      input_data();
+      break;
     case (STATEMENT_SELECT):
-    //TODO
-    break;
+      printf("Traversal of the B-Tree:\n");
+      traverse(tree->root);
+      printf("\n");
+      break;
+    case (STATEMENT_DELETE):
+      deleteKey(tree->root, statement->key);
+      printf("Deleted key %d from the B-Tree.\n", statement->key);
+      break;
     case (STATEMENT_SHOW):
-    read_data();
-    break;
+      read_data();
+      break;
   }
 }
 
-
-void repl(void){
+void repl(void) {
   signal(SIGINT, INThandler);
 
   InputBuffer* input_buffer = new_input_buffer();
+  bTree *tree = create_bTree();
+  const char *filename = "data.txt";
+  loadDataFromFile(filename, tree);
+
   while (true) {
     print_prompt();
     read_input(input_buffer);
@@ -144,7 +147,7 @@ void repl(void){
                input_buffer->buffer);
         continue;
     }
-     execute_statement(&statement);
-     printf("Executed.\n");
+    execute_statement(&statement, tree);
+    printf("Executed.\n");
   }
 }

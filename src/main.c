@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "repl.c"
-#include "btree.c"
+#include "btree.h"
 #include <stdbool.h>
 #include <string.h>
-
 
 void loadDataFromFile(const char *filename, bTree *tree) {
     FILE *file = fopen(filename, "r");
@@ -27,7 +25,9 @@ int main(int argc, char* argv[], char* envp[]) {
     const char *filename = "data.txt";
     loadDataFromFile(filename, tree);
 
-    repl();
+    printf("Traversal of the B-Tree:\n");
+    traverse(tree->root);
+    printf("\n");
 
     return 0;
 }
